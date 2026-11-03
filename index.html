@@ -635,8 +635,266 @@ body {
   <h2 class="section-title">新方案交互原型（可点击体验）</h2>
   <div class="prototype-section">
     <div class="prototype-tabs">
-      <button class="proto-tab active" onclick="showTab('detail', this)"></button>
+      <button class="proto-tab active" onclick="showTab('detail', this)">商品详情页</button>
+      <button class="proto-tab" onclick="showTab('cart-now', this)">购物车·现在喝</button>
+      <button class="proto-tab" onclick="showTab('cart-next', this)">购物车·下次喝</button>
     </div>
+
+    <div class="proto-display">
+      <div id="tab-detail" class="phone-frame">
+        <div class="phone-banner">
+          <div class="banner-text">赠送饮品可选下次喝</div>
+        </div>
+        <div class="phone-body">
+          <div class="product-name">杨枝甘露轻盈版</div>
+          <div class="product-sub">测试</div>
+
+          <div class="section-label">第1杯</div>
+          <div class="cup1-card">
+            <div class="cup1-img">🥭</div>
+            <div class="cup1-info">
+              <div class="cup1-name">杨枝甘露轻盈版</div>
+              <div class="cup1-spec">大、正常冰、七分甜</div>
+            </div>
+            <div class="cup1-price">
+              <div class="price">¥19</div>
+              <div class="change-spec-btn">改规格</div>
+            </div>
+          </div>
+
+          <div class="cup2-header">
+            <div class="section-label" style="margin-bottom:0;">第2杯</div>
+            <div class="title-text">赠送饮品可选下次喝</div>
+          </div>
+
+          <div class="mode-switch">
+            <div class="mode-switch-item active" id="switch-now" onclick="switchMode('now')">现在喝</div>
+            <div class="mode-switch-item" id="switch-next" onclick="switchMode('next')">下次喝</div>
+          </div>
+          <div class="mode-switch-desc" id="mode-desc">多款爆品任挑选，当场带走</div>
+
+          <div class="gift-list">
+            <div class="gift-item" data-name="杨枝甘露轻盈版" onclick="selectGift(this)">
+              <div class="gift-item-img">🥭</div>
+              <div class="gift-item-info">
+                <div class="gift-item-name">杨枝甘露轻盈版</div>
+                <div class="gift-item-price">¥16起</div>
+                <div class="gift-item-tag">兑换券 · 15天有效</div>
+              </div>
+              <div class="gift-item-check"></div>
+            </div>
+            <div class="gift-item" data-name="云岭茉莉" onclick="selectGift(this)">
+              <div class="gift-item-img">🍵</div>
+              <div class="gift-item-info">
+                <div class="gift-item-name">云岭茉莉</div>
+                <div class="gift-item-price">¥15起</div>
+                <div class="gift-item-tag">兑换券 · 15天有效</div>
+              </div>
+              <div class="gift-item-check"></div>
+            </div>
+            <div class="gift-item selected" data-name="生椰拿铁" onclick="selectGift(this)">
+              <div class="gift-item-img">☕</div>
+              <div class="gift-item-info">
+                <div class="gift-item-name">生椰拿铁</div>
+                <div class="gift-item-price">¥18起</div>
+                <div class="gift-item-tag">兑换券 · 15天有效</div>
+              </div>
+              <div class="gift-item-check"></div>
+            </div>
+          </div>
+
+          <div class="annotation">
+            去掉了选品弹窗，3款赠品直接平铺展示，点选即选中。顶部分段开关切换「现在喝/下次喝」，切换后赠品选择保留，标签自动从"实物"变成"兑换券"。
+          </div>
+        </div>
+        <div class="bottom-bar">
+          <div class="price-row">
+            <div class="price-text" id="detail-price">¥19</div>
+            <div class="qty-control">
+              <div class="qty-btn">−</div>
+              <span>1</span>
+              <div class="qty-btn">+</div>
+            </div>
+          </div>
+          <div class="add-cart-btn">加入购物车</div>
+        </div>
+      </div>
+
+      <div id="tab-cart-now" class="phone-frame" style="display:none;">
+        <div style="background:#f5f5f7;padding:20px;height:200px;display:flex;align-items:center;justify-content:center;color:#999;font-size:13px;">
+          （菜单页背景虚化）
+        </div>
+        <div class="cart-popup">
+          <div class="cart-header">
+            <div class="cart-title">全部 (1件)</div>
+            <div class="cart-clear">🗑 清空</div>
+          </div>
+          <div class="cart-item">
+            <span class="cart-item-tag">活动商品</span>
+            测试
+            <span class="cart-change-gift">更换赠送方式 ›</span>
+            <div style="clear:both;"></div>
+
+            <div class="cart-product-row">
+              <div class="cart-product-img">🥭</div>
+              <div class="cart-product-info">
+                <div class="cart-product-name">杨枝甘露轻盈版</div>
+                <div class="cart-product-spec">大、正常冰、七分甜</div>
+                <div class="cart-product-price">¥19</div>
+              </div>
+            </div>
+
+            <div class="cart-gift-row">
+              <div class="cart-product-img" style="background:linear-gradient(135deg,#d7ccc8,#a1887f);">☕</div>
+              <div class="cart-product-info">
+                <div><span class="gift-tag">送</span> 生椰拿铁</div>
+                <div class="cart-product-spec">杯、默认浓度、IIAC金奖豆、正常冰、默认糖、不另外加糖</div>
+                <div class="cart-product-price" style="color:#999;">¥0 <s>¥18</s></div>
+              </div>
+            </div>
+          </div>
+
+          <div class="cart-footer">
+            <div class="cart-total">¥19 <s>¥37</s></div>
+            <div class="checkout-btn">去结算</div>
+          </div>
+
+          <div class="annotation" style="margin-top:16px;">
+            现在喝模式：赠品是实物生椰拿铁。与旧逻辑一致。
+          </div>
+        </div>
+      </div>
+
+      <div id="tab-cart-next" class="phone-frame" style="display:none;">
+        <div style="background:#f5f5f7;padding:20px;height:200px;display:flex;align-items:center;justify-content:center;color:#999;font-size:13px;">
+          （菜单页背景虚化）
+        </div>
+        <div class="cart-popup">
+          <div class="cart-header">
+            <div class="cart-title">全部 (1件)</div>
+            <div class="cart-clear">🗑 清空</div>
+          </div>
+          <div class="cart-item">
+            <span class="cart-item-tag">活动商品</span>
+            测试
+            <span class="cart-change-gift">更换赠送方式 ›</span>
+            <div style="clear:both;"></div>
+
+            <div class="cart-product-row">
+              <div class="cart-product-img">🥭</div>
+              <div class="cart-product-info">
+                <div class="cart-product-name">杨枝甘露轻盈版</div>
+                <div class="cart-product-spec">大、正常冰、七分甜</div>
+                <div class="cart-product-price">¥19</div>
+              </div>
+            </div>
+
+            <div class="cart-gift-row">
+              <div class="gift-coupon-img">券<br>赠</div>
+              <div class="cart-product-info">
+                <div><span class="gift-tag">送</span> 生椰拿铁兑换券</div>
+                <div class="cart-product-spec">有效期15天，仅限兑换生椰拿铁</div>
+              </div>
+            </div>
+          </div>
+
+          <div class="cart-footer">
+            <div class="cart-total">¥19 <s>¥37</s></div>
+            <div class="checkout-btn">去结算</div>
+          </div>
+
+          <div class="annotation" style="margin-top:16px;">
+            下次喝模式：券是生椰拿铁专属兑换券。用户选了什么赠品，就囤什么券，核销时只能兑换这一款。
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <h2 class="section-title">逻辑闭环与边界情况</h2>
+  <div class="logic-grid">
+    <div class="logic-card">
+      <h4><span class="icon">🔄</span> 切换开关 → 赠品继承</h4>
+      <p>用户选了生椰拿铁，切到"下次喝"，赠品自动保留为生椰拿铁，卡片标签自动变成"兑换券·15天有效"。不需要重新选。</p>
+      <div class="scenario">
+        <strong>例：</strong>现在喝选了生椰拿铁 → 切下次喝 → 赠品还是生椰拿铁，只是从实物变成券
+      </div>
+    </div>
+    <div class="logic-card">
+      <h4><span class="icon">✏️</span> 换赠品 → 全局生效</h4>
+      <p>不管在现在喝还是下次喝模式下，用户点选其他赠品，切换模式后赠品保持一致。</p>
+      <div class="scenario">
+        <strong>例：</strong>下次喝模式下点了云岭茉莉 → 切回现在喝 → 赠品自动变成云岭茉莉
+      </div>
+    </div>
+    <div class="logic-card">
+      <h4><span class="icon">🔀</span> 购物车「更换赠送方式」</h4>
+      <p>点击后弹出底部半屏弹窗，就是这个分段开关+平铺选品的同款面板，赠品选择保留，只切换交付形式。</p>
+      <div class="scenario">
+        <strong>一致性：</strong>详情页和购物车用同一套交互组件，体验统一
+      </div>
+    </div>
+    <div class="logic-card">
+      <h4><span class="icon">📦</span> 数量 ×N → 赠品同步 ×N</h4>
+      <p>买1送1按件计算。数量改为2时，赠品自动变为2杯生椰拿铁（现在喝）或2张生椰拿铁兑换券（下次喝）。</p>
+      <div class="scenario">
+        <strong>例：</strong>数量=2 → 买2杯杨枝甘露，送2杯生椰拿铁 或 送2张生椰拿铁兑换券
+      </div>
+    </div>
+    <div class="logic-card">
+      <h4><span class="icon">🚫</span> 禁止逻辑漏洞</h4>
+      <p>券的商品ID与所选赠品商品ID强制绑定，前后端双重校验，杜绝"选了生椰拿铁但发了通用券"的错配。</p>
+      <div class="scenario">
+        <strong>防护：</strong>下单时赠品ID = 券模板绑定的商品ID，不一致则拦截
+      </div>
+    </div>
+    <div class="logic-card">
+      <h4><span class="icon">💰</span> 差价逻辑保留</h4>
+      <p>原"最高送19元，超出补差价"逻辑保留。赠品选了18元的生椰拿铁，不需要补差价；如果选了20元的品，需要补2元差价。</p>
+      <div class="scenario">
+        <strong>说明：</strong>因为赠品依然是3选1，不同商品价格不同，所以补差价逻辑保留
+      </div>
+    </div>
+  </div>
+
+  <h2 class="section-title">业内最佳实践依据</h2>
+  <div class="best-practice">
+    <table>
+      <thead>
+        <tr>
+          <th>设计维度</th>
+          <th>本方案做法</th>
+          <th>为什么是最佳实践</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td>操作路径</td>
+          <td>去掉弹窗，平铺选品+分段开关</td>
+          <td>减少一次弹窗交互，所见即所得，用户决策效率更高</td>
+        </tr>
+        <tr>
+          <td>一致性</td>
+          <td>选什么赠品就囤什么券，完全对应</td>
+          <td>消除"我选了A赠品但囤了通用券能换啥"的预期落差</td>
+        </tr>
+        <tr>
+          <td>信息透明度</td>
+          <td>平铺展示所有选项，不用点开弹窗</td>
+          <td>用户一眼就能看到全部赠品选项，不用猜里面有什么</td>
+        </tr>
+        <tr>
+          <td>交互效率</td>
+          <td>开关切换即生效，赠品自动继承</td>
+          <td>切换方式不用重新选赠品，操作成本最低</td>
+        </tr>
+        <tr>
+          <td>UI一致性</td>
+          <td>保留原卡片选中态、配色体系</td>
+          <td>老用户无学习成本，视觉迭代平滑</td>
+        </tr>
+      </tbody>
+    </table>
   </div>
 
 </div>
@@ -655,12 +913,16 @@ function switchMode(mode) {
     switchNow.classList.add('active');
     switchNext.classList.remove('active');
     modeDesc.textContent = '多款爆品任挑选，当场带走';
-    giftTags.forEach(function(tag) { tag.style.display = 'none'; });
+    giftTags.forEach(function(tag) {
+      tag.style.display = 'none';
+    });
   } else {
     switchNext.classList.add('active');
     switchNow.classList.remove('active');
     modeDesc.textContent = '选1款爆品，囤专属兑换券，15天有效';
-    giftTags.forEach(function(tag) { tag.style.display = 'inline-block'; });
+    giftTags.forEach(function(tag) {
+      tag.style.display = 'inline-block';
+    });
   }
 }
 
