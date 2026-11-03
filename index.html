@@ -1,0 +1,955 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>买一送一交互链路优化方案</title>
+<style>
+* { margin: 0; padding: 0; box-sizing: border-box; }
+body {
+  font-family: -apple-system, BlinkMacSystemFont, "PingFang SC", "Helvetica Neue", sans-serif;
+  background: #f5f5f7;
+  color: #1d1d1f;
+  line-height: 1.6;
+  padding: 20px;
+}
+.container { max-width: 960px; margin: 0 auto; }
+
+/* 头部 */
+.header {
+  background: linear-gradient(135deg, #c8102e 0%, #8b0a1f 100%);
+  color: white;
+  border-radius: 16px;
+  padding: 32px;
+  margin-bottom: 24px;
+}
+.header h1 { font-size: 24px; margin-bottom: 8px; font-weight: 700; }
+.header p { opacity: 0.9; font-size: 14px; }
+
+/* 变更核心 */
+.change-core {
+  background: white;
+  border-radius: 12px;
+  padding: 24px;
+  margin-bottom: 24px;
+  box-shadow: 0 1px 3px rgba(0,0,0,0.06);
+}
+.change-core h2 { font-size: 18px; margin-bottom: 16px; color: #c8102e; }
+.change-grid {
+  display: grid;
+  grid-template-columns: 1fr auto 1fr;
+  gap: 16px;
+  align-items: center;
+}
+.change-card {
+  padding: 16px;
+  border-radius: 8px;
+  font-size: 13px;
+}
+.change-old { background: #fff5f5; border: 1px solid #ffd5d5; }
+.change-new { background: #f0fff4; border: 1px solid #bbf7d0; }
+.change-card .label { font-weight: 600; margin-bottom: 8px; font-size: 12px; }
+.change-old .label { color: #c8102e; }
+.change-new .label { color: #16a34a; }
+.change-arrow { font-size: 24px; color: #999; font-weight: bold; }
+
+/* 区块标题 */
+.section-title {
+  font-size: 18px;
+  font-weight: 600;
+  margin: 32px 0 16px;
+  padding-left: 12px;
+  border-left: 4px solid #c8102e;
+}
+
+/* 流程对比 */
+.flow-compare {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 20px;
+  margin-bottom: 24px;
+}
+.flow-col {
+  background: white;
+  border-radius: 12px;
+  padding: 20px;
+  box-shadow: 0 1px 3px rgba(0,0,0,0.06);
+}
+.flow-col h3 {
+  font-size: 15px;
+  margin-bottom: 16px;
+  padding-bottom: 8px;
+  border-bottom: 1px solid #eee;
+}
+.flow-col.old h3 { color: #999; }
+.flow-col.new h3 { color: #c8102e; }
+.flow-step {
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+  margin-bottom: 12px;
+  font-size: 13px;
+}
+.step-num {
+  width: 22px;
+  height: 22px;
+  border-radius: 50%;
+  background: #eee;
+  color: #666;
+  font-size: 12px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  font-weight: 600;
+}
+.flow-col.new .step-num { background: #c8102e; color: white; }
+.step-content { flex: 1; }
+.step-content .step-title { font-weight: 500; margin-bottom: 2px; }
+.step-content .step-desc { font-size: 12px; color: #888; }
+.flow-removed { opacity: 0.5; text-decoration: line-through; }
+.flow-new-tag {
+  display: inline-block;
+  background: #c8102e;
+  color: white;
+  font-size: 10px;
+  padding: 1px 6px;
+  border-radius: 4px;
+  margin-left: 6px;
+}
+
+/* 手机原型展示 */
+.prototype-section {
+  background: white;
+  border-radius: 12px;
+  padding: 24px;
+  margin-bottom: 24px;
+  box-shadow: 0 1px 3px rgba(0,0,0,0.06);
+}
+.prototype-tabs {
+  display: flex;
+  gap: 8px;
+  margin-bottom: 20px;
+  flex-wrap: wrap;
+}
+.proto-tab {
+  padding: 8px 16px;
+  border-radius: 20px;
+  font-size: 13px;
+  background: #f0f0f5;
+  cursor: pointer;
+  border: none;
+  transition: all 0.2s;
+}
+.proto-tab.active {
+  background: #c8102e;
+  color: white;
+}
+.proto-display {
+  display: flex;
+  justify-content: center;
+  padding: 20px 0;
+}
+.phone-frame {
+  width: 320px;
+  background: #f5f5f7;
+  border-radius: 24px;
+  overflow: hidden;
+  box-shadow: 0 4px 24px rgba(0,0,0,0.12);
+}
+.phone-banner {
+  background: linear-gradient(135deg, #8b0a1f 0%, #c8102e 100%);
+  padding: 24px 20px;
+  text-align: center;
+}
+.phone-banner .banner-text {
+  color: #ffe8a3;
+  font-size: 18px;
+  font-weight: 700;
+  font-style: italic;
+}
+.phone-body { padding: 16px; }
+.product-name { font-size: 20px; font-weight: 700; margin-bottom: 4px; }
+.product-sub { font-size: 13px; color: #999; margin-bottom: 16px; }
+.section-label {
+  display: inline-flex;
+  align-items: center;
+  background: #c8102e;
+  color: white;
+  font-size: 12px;
+  padding: 4px 10px;
+  border-radius: 4px;
+  margin-bottom: 12px;
+  font-weight: 600;
+}
+
+/* 第1杯卡片 */
+.cup1-card {
+  background: #fafafa;
+  border-radius: 8px;
+  padding: 12px;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 16px;
+}
+.cup1-img {
+  width: 56px;
+  height: 56px;
+  background: linear-gradient(135deg, #ff9a56, #ff6b35);
+  border-radius: 8px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 24px;
+}
+.cup1-info { flex: 1; }
+.cup1-name { font-size: 15px; font-weight: 500; }
+.cup1-spec { font-size: 12px; color: #999; margin-top: 2px; }
+.cup1-price { text-align: right; }
+.cup1-price .price { font-size: 16px; font-weight: 600; }
+.change-spec-btn {
+  background: #d4a853;
+  color: white;
+  font-size: 11px;
+  padding: 4px 10px;
+  border-radius: 4px;
+  margin-top: 4px;
+  display: inline-block;
+}
+
+/* 第2杯选择区 */
+.cup2-title-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 12px;
+}
+.cup2-title-row .title-text {
+  font-size: 14px;
+  color: #c8102e;
+  font-weight: 500;
+}
+.option-cards {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 10px;
+  margin-bottom: 16px;
+}
+.option-card {
+  border: 1.5px solid #eee;
+  border-radius: 8px;
+  padding: 12px;
+  cursor: pointer;
+  position: relative;
+  transition: all 0.2s;
+  background: white;
+}
+.option-card.selected {
+  border-color: #c8102e;
+  background: #fff5f6;
+}
+.option-card .radio {
+  position: absolute;
+  top: 10px;
+  right: 10px;
+  width: 20px;
+  height: 20px;
+  border-radius: 50%;
+  border: 2px solid #ddd;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.option-card.selected .radio {
+  border-color: #c8102e;
+  background: #c8102e;
+}
+.option-card.selected .radio::after {
+  content: '✓';
+  color: white;
+  font-size: 12px;
+}
+.option-title { font-size: 15px; font-weight: 600; margin-bottom: 4px; padding-right: 24px; }
+.option-desc { font-size: 11px; color: #888; margin-bottom: 8px; }
+
+/* 现在喝卡片内容 */
+.now-preview {
+  display: flex;
+  gap: 6px;
+  margin-top: 8px;
+}
+.now-preview .preview-item {
+  width: 36px;
+  height: 36px;
+  border-radius: 6px;
+  background: #f0f0f0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 16px;
+}
+.now-preview .preview-item.single {
+  width: 100%;
+  height: 48px;
+  background: linear-gradient(135deg, #ff9a56, #ff6b35);
+  font-size: 20px;
+}
+.now-same-tag {
+  font-size: 10px;
+  color: #c8102e;
+  background: #ffe8ea;
+  padding: 2px 6px;
+  border-radius: 4px;
+  margin-top: 6px;
+  display: inline-block;
+}
+
+/* 下次喝券卡片 */
+.coupon-card {
+  background: #c8102e;
+  color: white;
+  border-radius: 8px;
+  padding: 12px;
+  text-align: center;
+  margin-top: 8px;
+  position: relative;
+}
+.coupon-card::before, .coupon-card::after {
+  content: '';
+  position: absolute;
+  left: -4px;
+  width: 8px;
+  height: 8px;
+  background: white;
+  border-radius: 50%;
+}
+.coupon-card::before { top: 50%; transform: translateY(-50%); }
+.coupon-card::after { bottom: 50%; transform: translateY(-50%); }
+.coupon-value { font-size: 22px; font-weight: 700; }
+.coupon-value small { font-size: 12px; }
+.coupon-name { font-size: 11px; margin-top: 2px; opacity: 0.95; }
+.coupon-tip { font-size: 10px; opacity: 0.8; margin-top: 2px; }
+
+/* 底部操作栏 */
+.bottom-bar {
+  background: white;
+  padding: 12px 16px;
+  border-top: 1px solid #eee;
+}
+.price-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 10px;
+}
+.price-text { font-size: 18px; font-weight: 700; color: #c8102e; }
+.qty-control {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+.qty-btn {
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  background: #f0f0f0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 16px;
+  color: #666;
+}
+.add-cart-btn {
+  background: #1d1d1f;
+  color: white;
+  text-align: center;
+  padding: 14px;
+  border-radius: 24px;
+  font-size: 16px;
+  font-weight: 500;
+}
+
+/* 标注说明 */
+.annotation {
+  position: relative;
+  background: #fff8e1;
+  border-left: 3px solid #ff9800;
+  padding: 10px 14px;
+  margin: 12px 0;
+  font-size: 12px;
+  border-radius: 0 6px 6px 0;
+}
+.annotation::before {
+  content: '💡 变化点';
+  font-weight: 600;
+  color: #e65100;
+  display: block;
+  margin-bottom: 4px;
+  font-size: 11px;
+}
+
+/* 逻辑闭环 */
+.logic-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  gap: 16px;
+}
+.logic-card {
+  background: white;
+  border-radius: 10px;
+  padding: 16px;
+  box-shadow: 0 1px 3px rgba(0,0,0,0.06);
+}
+.logic-card h4 {
+  font-size: 14px;
+  margin-bottom: 8px;
+  color: #1d1d1f;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+.logic-card .icon { font-size: 18px; }
+.logic-card p { font-size: 12px; color: #666; line-height: 1.6; }
+.logic-card .scenario {
+  background: #f8f9fa;
+  border-radius: 6px;
+  padding: 8px 10px;
+  margin-top: 8px;
+  font-size: 11px;
+  color: #555;
+}
+.logic-card .scenario strong { color: #c8102e; }
+
+/* 最佳实践对比表 */
+.best-practice {
+  background: white;
+  border-radius: 12px;
+  padding: 24px;
+  margin-bottom: 24px;
+  box-shadow: 0 1px 3px rgba(0,0,0,0.06);
+}
+.best-practice table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 13px;
+}
+.best-practice th, .best-practice td {
+  padding: 10px 12px;
+  text-align: left;
+  border-bottom: 1px solid #f0f0f0;
+}
+.best-practice th {
+  background: #fafafa;
+  font-weight: 600;
+  color: #333;
+}
+.best-practice td:first-child { font-weight: 500; color: #c8102e; }
+
+/* 购物车弹窗模拟 */
+.cart-popup {
+  background: white;
+  border-radius: 16px 16px 0 0;
+  margin-top: -40px;
+  position: relative;
+  padding: 20px 16px;
+}
+.cart-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 16px;
+}
+.cart-title { font-size: 16px; font-weight: 600; }
+.cart-clear { font-size: 12px; color: #999; }
+.cart-item {
+  background: #fafafa;
+  border-radius: 8px;
+  padding: 12px;
+  margin-bottom: 12px;
+}
+.cart-item-tag {
+  display: inline-block;
+  background: #c8102e;
+  color: white;
+  font-size: 10px;
+  padding: 2px 6px;
+  border-radius: 3px;
+  margin-right: 6px;
+}
+.cart-change-gift {
+  float: right;
+  font-size: 12px;
+  color: #666;
+}
+.cart-product-row {
+  display: flex;
+  gap: 10px;
+  margin-top: 10px;
+  align-items: flex-start;
+}
+.cart-product-img {
+  width: 48px;
+  height: 48px;
+  border-radius: 6px;
+  background: linear-gradient(135deg, #ff9a56, #ff6b35);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 20px;
+  flex-shrink: 0;
+}
+.cart-product-info { flex: 1; }
+.cart-product-name { font-size: 14px; font-weight: 500; }
+.cart-product-spec { font-size: 11px; color: #999; margin-top: 2px; }
+.cart-product-price { font-size: 14px; font-weight: 600; margin-top: 4px; }
+.cart-gift-row {
+  display: flex;
+  gap: 10px;
+  margin-top: 10px;
+  padding-top: 10px;
+  border-top: 1px dashed #eee;
+  align-items: flex-start;
+}
+.gift-tag {
+  display: inline-block;
+  background: #c8102e;
+  color: white;
+  font-size: 10px;
+  padding: 1px 5px;
+  border-radius: 3px;
+}
+.gift-coupon-img {
+  width: 48px;
+  height: 48px;
+  border-radius: 6px;
+  background: linear-gradient(135deg, #c8102e, #8b0a1f);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: white;
+  font-size: 10px;
+  flex-shrink: 0;
+  text-align: center;
+}
+.cart-footer {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-top: 12px;
+  padding-top: 12px;
+  border-top: 1px solid #eee;
+}
+.cart-total { font-size: 16px; font-weight: 700; color: #c8102e; }
+.cart-total s { font-size: 12px; color: #999; margin-left: 4px; font-weight: 400; }
+.checkout-btn {
+  background: #1d1d1f;
+  color: white;
+  padding: 10px 24px;
+  border-radius: 20px;
+  font-size: 14px;
+}
+
+/* 响应式 */
+@media (max-width: 768px) {
+  .flow-compare { grid-template-columns: 1fr; }
+  .change-grid { grid-template-columns: 1fr; }
+  .change-arrow { text-align: center; transform: rotate(90deg); }
+}
+</style>
+</head>
+<body>
+<div class="container">
+
+  <!-- 头部 -->
+  <div class="header">
+    <h1>买一送一交互链路优化方案</h1>
+    <p>核心变更：赠品选品 = 囤券范围，均锁定为第1杯同款商品</p>
+  </div>
+
+  <!-- 变更核心 -->
+  <div class="change-core">
+    <h2>业务变更核心</h2>
+    <div class="change-grid">
+      <div class="change-card change-old">
+        <div class="label">❌ 旧逻辑</div>
+        <div>
+          <div>买杨枝甘露 → 现在喝可选生椰拿铁/云岭茉莉等</div>
+          <div style="margin-top:6px;">下次喝 → 囤19元通用爆品免单券（可换任意爆品）</div>
+          <div style="margin-top:6px;color:#999;font-size:12px;">→ 选品范围 ≠ 券兑换范围，存在预期差</div>
+        </div>
+      </div>
+      <div class="change-arrow">→</div>
+      <div class="change-card change-new">
+        <div class="label">✅ 新逻辑</div>
+        <div>
+          <div>买杨枝甘露 → 现在喝只能送杨枝甘露（同款）</div>
+          <div style="margin-top:6px;">下次喝 → 囤杨枝甘露兑换券（同款专属）</div>
+          <div style="margin-top:6px;color:#16a34a;font-size:12px;">→ 选品范围 = 券兑换范围，完全一致</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- 流程对比 -->
+  <h2 class="section-title">用户操作流程对比</h2>
+  <div class="flow-compare">
+    <div class="flow-col old">
+      <h3>旧流程（5步决策）</h3>
+      <div class="flow-step">
+        <div class="step-num">1</div>
+        <div class="step-content">
+          <div class="step-title">选第1杯商品</div>
+          <div class="step-desc">选商品 + 规格</div>
+        </div>
+      </div>
+      <div class="flow-step">
+        <div class="step-num">2</div>
+        <div class="step-content">
+          <div class="step-title">选赠送方式：现在喝 / 下次喝</div>
+          <div class="step-desc">二选一</div>
+        </div>
+      </div>
+      <div class="flow-step flow-removed">
+        <div class="step-num">3</div>
+        <div class="step-content">
+          <div class="step-title">现在喝 → 弹出选品弹窗</div>
+          <div class="step-desc">从多款爆品中选1款赠品</div>
+        </div>
+      </div>
+      <div class="flow-step flow-removed">
+        <div class="step-num">4</div>
+        <div class="step-content">
+          <div class="step-title">选赠品规格</div>
+          <div class="step-desc">单独配杯型/冰度/甜度</div>
+        </div>
+      </div>
+      <div class="flow-step">
+        <div class="step-num">5</div>
+        <div class="step-content">
+          <div class="step-title">加入购物车</div>
+          <div class="step-desc">确认订单</div>
+        </div>
+      </div>
+    </div>
+    <div class="flow-col new">
+      <h3>新流程（3步决策）<span class="flow-new-tag">简化40%</span></h3>
+      <div class="flow-step">
+        <div class="step-num">1</div>
+        <div class="step-content">
+          <div class="step-title">选第1杯商品</div>
+          <div class="step-desc">选商品 + 规格（不变）</div>
+        </div>
+      </div>
+      <div class="flow-step">
+        <div class="step-num">2</div>
+        <div class="step-content">
+          <div class="step-title">选赠送方式：现在喝 / 下次喝</div>
+          <div class="step-desc">二选一，赠品自动锁定同款</div>
+        </div>
+      </div>
+      <div class="flow-step" style="opacity:0.4;">
+        <div class="step-num">3</div>
+        <div class="step-content">
+          <div class="step-title" style="text-decoration:line-through;">选赠品商品 + 规格</div>
+          <div class="step-desc">已省略 → 自动跟随第1杯</div>
+        </div>
+      </div>
+      <div class="flow-step">
+        <div class="step-num">4</div>
+        <div class="step-content">
+          <div class="step-title">加入购物车</div>
+          <div class="step-desc">确认订单</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- 交互原型 -->
+  <h2 class="section-title">新方案交互原型（可点击切换）</h2>
+  <div class="prototype-section">
+    <div class="prototype-tabs">
+      <button class="proto-tab active" onclick="showTab('detail', this)">商品详情页</button>
+      <button class="proto-tab" onclick="showTab('cart-now', this)">购物车·现在喝</button>
+      <button class="proto-tab" onclick="showTab('cart-next', this)">购物车·下次喝</button>
+    </div>
+
+    <div class="proto-display">
+      <!-- 商品详情页 -->
+      <div id="tab-detail" class="phone-frame">
+        <div class="phone-banner">
+          <div class="banner-text">赠送饮品可选下次喝</div>
+        </div>
+        <div class="phone-body">
+          <div class="product-name">杨枝甘露轻盈版</div>
+          <div class="product-sub">测试</div>
+
+          <div class="section-label">第1杯</div>
+          <div class="cup1-card">
+            <div class="cup1-img">🥭</div>
+            <div class="cup1-info">
+              <div class="cup1-name">杨枝甘露轻盈版</div>
+              <div class="cup1-spec">大、正常冰、七分甜</div>
+            </div>
+            <div class="cup1-price">
+              <div class="price">¥19</div>
+              <div class="change-spec-btn">改规格</div>
+            </div>
+          </div>
+
+          <div class="cup2-title-row">
+            <div class="section-label" style="margin-bottom:0;">第2杯</div>
+            <div class="title-text">同款饮品，现在喝或下次喝</div>
+          </div>
+
+          <div class="option-cards">
+            <div class="option-card selected" id="opt-now" onclick="selectOption('now')">
+              <div class="radio"></div>
+              <div class="option-title">现在喝</div>
+              <div class="option-desc">同款饮品，立即带走</div>
+              <div class="now-preview">
+                <div class="preview-item single">🥭</div>
+              </div>
+              <div class="now-same-tag">与第1杯同款同规格</div>
+            </div>
+            <div class="option-card" id="opt-next" onclick="selectOption('next')">
+              <div class="radio"></div>
+              <div class="option-title">下次喝</div>
+              <div class="option-desc">下单后自动到账，15天有效</div>
+              <div class="coupon-card">
+                <div class="coupon-value"><small>杨枝甘露</small></div>
+                <div class="coupon-name">轻盈版兑换券</div>
+                <div class="coupon-tip">过期不退</div>
+              </div>
+            </div>
+          </div>
+
+          <div class="annotation">
+            「现在喝」卡片下方只展示1个同款缩略图，不再弹出选品弹窗；券卡片从「19元等值爆品免单券」改为「杨枝甘露轻盈版兑换券」，明确锁定商品。
+          </div>
+        </div>
+        <div class="bottom-bar">
+          <div class="price-row">
+            <div class="price-text" id="detail-price">¥19</div>
+            <div class="qty-control">
+              <div class="qty-btn">−</div>
+              <span>1</span>
+              <div class="qty-btn">+</div>
+            </div>
+          </div>
+          <div class="add-cart-btn">加入购物车</div>
+        </div>
+      </div>
+
+      <!-- 购物车·现在喝 -->
+      <div id="tab-cart-now" class="phone-frame" style="display:none;">
+        <div style="background:#f5f5f7;padding:20px;height:200px;display:flex;align-items:center;justify-content:center;color:#999;font-size:13px;">
+          （菜单页背景虚化）
+        </div>
+        <div class="cart-popup">
+          <div class="cart-header">
+            <div class="cart-title">全部 (1件)</div>
+            <div class="cart-clear">🗑 清空</div>
+          </div>
+          <div class="cart-item">
+            <span class="cart-item-tag">活动商品</span>
+            测试
+            <span class="cart-change-gift">更换赠送方式 ›</span>
+            <div style="clear:both;"></div>
+
+            <div class="cart-product-row">
+              <div class="cart-product-img">🥭</div>
+              <div class="cart-product-info">
+                <div class="cart-product-name">杨枝甘露轻盈版</div>
+                <div class="cart-product-spec">大、正常冰、七分甜</div>
+                <div class="cart-product-price">¥19</div>
+              </div>
+            </div>
+
+            <div class="cart-gift-row">
+              <div class="cart-product-img" style="background:linear-gradient(135deg,#ff9a56,#ff6b35);">🥭</div>
+              <div class="cart-product-info">
+                <div><span class="gift-tag">送</span> 杨枝甘露轻盈版（同款）</div>
+                <div class="cart-product-spec">大、正常冰、七分甜</div>
+                <div class="cart-product-price" style="color:#999;">¥0 <s>¥19</s></div>
+              </div>
+            </div>
+          </div>
+
+          <div class="cart-footer">
+            <div class="cart-total">¥19 <s>¥38</s></div>
+            <div class="checkout-btn">去结算</div>
+          </div>
+
+          <div class="annotation" style="margin-top:16px;">
+            赠品行展示同款商品+同款规格，明确标注「同款」。「更换赠送方式」入口保留，点击后弹出与详情页一致的二选一面板。
+          </div>
+        </div>
+      </div>
+
+      <!-- 购物车·下次喝 -->
+      <div id="tab-cart-next" class="phone-frame" style="display:none;">
+        <div style="background:#f5f5f7;padding:20px;height:200px;display:flex;align-items:center;justify-content:center;color:#999;font-size:13px;">
+          （菜单页背景虚化）
+        </div>
+        <div class="cart-popup">
+          <div class="cart-header">
+            <div class="cart-title">全部 (1件)</div>
+            <div class="cart-clear">🗑 清空</div>
+          </div>
+          <div class="cart-item">
+            <span class="cart-item-tag">活动商品</span>
+            测试
+            <span class="cart-change-gift">更换赠送方式 ›</span>
+            <div style="clear:both;"></div>
+
+            <div class="cart-product-row">
+              <div class="cart-product-img">🥭</div>
+              <div class="cart-product-info">
+                <div class="cart-product-name">杨枝甘露轻盈版</div>
+                <div class="cart-product-spec">大、正常冰、七分甜</div>
+                <div class="cart-product-price">¥19</div>
+              </div>
+            </div>
+
+            <div class="cart-gift-row">
+              <div class="gift-coupon-img">券<br>赠</div>
+              <div class="cart-product-info">
+                <div><span class="gift-tag">送</span> 杨枝甘露轻盈版兑换券</div>
+                <div class="cart-product-spec">有效期15天，过期不退</div>
+              </div>
+            </div>
+          </div>
+
+          <div class="cart-footer">
+            <div class="cart-total">¥19 <s>¥38</s></div>
+            <div class="checkout-btn">去结算</div>
+          </div>
+
+          <div class="annotation" style="margin-top:16px;">
+            券从「19元爆品免单券」改为「杨枝甘露轻盈版兑换券」，用户清晰知道下次来喝什么，不会产生"我有一张19元券能换啥"的疑惑。
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- 逻辑闭环 -->
+  <h2 class="section-title">逻辑闭环与边界情况</h2>
+  <div class="logic-grid">
+    <div class="logic-card">
+      <h4><span class="icon">🔄</span> 改第1杯规格 → 赠品/券同步</h4>
+      <p>用户修改第1杯的杯型/冰度/甜度时，赠品（现在喝）和券（下次喝）自动同步更新。</p>
+      <div class="scenario">
+        <strong>例：</strong>杨枝甘露大杯→中杯，赠品自动变为中杯，券自动变为中杯兑换券。无需用户重新操作。
+      </div>
+    </div>
+    <div class="logic-card">
+      <h4><span class="icon">🔀</span> 购物车「更换赠送方式」</h4>
+      <p>点击后弹出底部半屏弹窗，包含「现在喝」「下次喝」两个选项，与详情页选择面板视觉一致。</p>
+      <div class="scenario">
+        <strong>切换后：</strong>赠品行内容实时替换（实物↔券），价格不变，购物车数量不变。
+      </div>
+    </div>
+    <div class="logic-card">
+      <h4><span class="icon">📦</span> 数量 ×N → 赠品同步 ×N</h4>
+      <p>买1送1是按件计算。数量改为2时，赠品自动变为2杯同款 / 2张兑换券。</p>
+      <div class="scenario">
+        <strong>例：</strong>数量=2 → 买2杯杨枝甘露，送2杯杨枝甘露（现在喝）或送2张兑换券（下次喝）。
+      </div>
+    </div>
+    <div class="logic-card">
+      <h4><span class="icon">⚠️</span> 第1杯换商品 → 赠品自动跟随</h4>
+      <p>用户从活动区进入另一款活动商品时，赠品自动切换为新商品同款，无需用户重新选择赠送方式。</p>
+      <div class="scenario">
+        <strong>例：</strong>从杨枝甘露切到生椰拿铁 → 赠品自动变生椰拿铁，券自动变生椰拿铁兑换券。
+      </div>
+    </div>
+    <div class="logic-card">
+      <h4><span class="icon">🚫</span> 禁止逻辑漏洞</h4>
+      <p>原逻辑可能出现"买A送B但囤的是A券"的错配；新逻辑从UI层强制绑定，用户无操作路径产生错配。</p>
+      <div class="scenario">
+        <strong>防护：</strong>赠品商品ID = 第1杯商品ID，券模板ID = 第1杯商品ID专属，前后端双重校验。
+      </div>
+    </div>
+    <div class="logic-card">
+      <h4><span class="icon">💰</span> 价格一致性</h4>
+      <p>无论选「现在喝」还是「下次喝」，支付价格均为第1杯价格。赠品和券都是0元赠送，不产生补差价逻辑。</p>
+      <div class="scenario">
+        <strong>简化：</strong>原"最高送19元，超出补差价"逻辑取消，因为赠品就是同款，不存在差价问题。
+      </div>
+    </div>
+  </div>
+
+  <!-- 业内最佳实践对比 -->
+  <h2 class="section-title">业内最佳实践依据</h2>
+  <div class="best-practice">
+    <table>
+      <thead>
+        <tr>
+          <th>设计维度</th>
+          <th>本方案做法</th>
+          <th>为什么是最佳实践</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td>决策步骤</td>
+          <td>从5步减至3步，去掉选品弹窗</td>
+          <td>减少认知负荷，用户操作路径缩短40%，转化漏斗更短</td>
+        </tr>
+        <tr>
+          <td>预期一致性</td>
+          <td>买什么送什么，券也是同款</td>
+          <td>消除"赠品≠囤券"的预期落差，用户不会感到被套路</td>
+        </tr>
+        <tr>
+          <td>信息透明度</td>
+          <td>券面直接写商品名，不写"等值XX元"</td>
+          <td>用户清楚知道自己拿到了什么，核销时不困惑</td>
+        </tr>
+        <tr>
+          <td>UI一致性</td>
+          <td>保留原卡片布局、选中态、配色体系</td>
+          <td>老用户无学习成本，视觉迭代平滑</td>
+        </tr>
+        <tr>
+          <td>容错性</td>
+          <td>所有联动自动同步，无需用户手动维护</td>
+          <td>降低出错概率，减少客诉（如赠品选错商品）</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+
+</div>
+
+<script>
+function selectOption(type) {
+  var optNow = document.getElementById('opt-now');
+  var optNext = document.getElementById('opt-next');
+  var price = document.getElementById('detail-price');
+  if (type === 'now') {
+    optNow.classList.add('selected');
+    optNext.classList.remove('selected');
+    price.textContent = '¥19';
+  } else {
+    optNext.classList.add('selected');
+    optNow.classList.remove('selected');
+    price.textContent = '¥19';
+  }
+}
+
+function showTab(tabId, btn) {
+  document.querySelectorAll('.proto-tab').forEach(function(t) {
+    t.classList.remove('active');
+  });
+  btn.classList.add('active');
+  ['detail', 'cart-now', 'cart-next'].forEach(function(id) {
+    document.getElementById('tab-' + id).style.display = 'none';
+  });
+  document.getElementById('tab-' + id).style.display = 'block';
+}
+</script>
+</body>
+</html>
